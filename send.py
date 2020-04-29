@@ -5,6 +5,7 @@ import socket
 import random
 import struct
 import argparse
+from datetime import datetime 
 import time
 
 from scapy.all import sendp, send, get_if_list, get_if_hwaddr, hexdump
@@ -38,8 +39,7 @@ def main():
     flag_3 = args.flag_3
     iface = get_if()
     pkt1 = 0
-    timestamp = int(time.time())
-    print timestamp
+   
     if (dst_id is not None):
         print "sending first packet on interface {} to dst_id {}".format(iface, str(dst_id))
         pkt =  Ether(src=get_if_hwaddr(iface), dst='ff:ff:ff:ff:ff:ff')
@@ -56,9 +56,16 @@ def main():
     pkt.show2()
 #    hexdump(pkt)
 #    print "len(pkt) = ", len(pkt)
+    timestamp = datetime.now()
+    print "TIMEONE-> " + timestamp.strftime('%M:%S,%f')
+
     sendp(pkt, iface=iface, verbose=False)
+    time.sleep(1)
+    
     if(pkt1 != 0):
         pkt1.show2()
+	timestamp = datetime.now()
+    	print "TIMETWO-> " + timestamp.strftime('%M:%S,%f')
         sendp(pkt1, iface=iface, verbose=False)
 
 

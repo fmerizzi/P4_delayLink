@@ -2,6 +2,7 @@
 import sys
 import struct
 import os
+from datetime import datetime
 
 from scapy.all import sniff, sendp, hexdump, get_if_list, get_if_hwaddr
 from scapy.all import Packet, IPOption
@@ -25,6 +26,8 @@ def get_if():
 def handle_pkt(pkt):
     if MyTunnel in pkt or (TCP in pkt and pkt[TCP].dport == 1234):
         print "got a packet"
+	timestamp = datetime.now()
+    	print "TIMESTAMP-> " + timestamp.strftime('%M:%S,%f')
         pkt.show2()
 #        hexdump(pkt)
 #        print "len(pkt) = ", len(pkt)
