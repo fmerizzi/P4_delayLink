@@ -13,6 +13,9 @@ from scapy.all import Packet
 from scapy.all import Ether, IP, UDP, TCP
 from myTunnel_header import MyTunnel
 
+delay = 20
+filename = "dataStart.csv"
+
 def get_if():
     ifs=get_if_list()
     iface=None # "h1-eth0"
@@ -56,17 +59,21 @@ def main():
     pkt.show2()
 #    hexdump(pkt)
 #    print "len(pkt) = ", len(pkt)
+    f = open(filename,"a");
+    f.write("\n");
+    
     timestamp = datetime.now()
-    print "TIMEONE-> " + timestamp.strftime('%M:%S,%f')
-
+    f.write(timestamp.strftime('%S.%f') + ",");
     sendp(pkt, iface=iface, verbose=False)
-    time.sleep(1)
+    time.sleep(delay)
     
     if(pkt1 != 0):
         pkt1.show2()
 	timestamp = datetime.now()
-    	print "TIMETWO-> " + timestamp.strftime('%M:%S,%f')
+    	f.write(timestamp.strftime('%S.%f') + ",");
         sendp(pkt1, iface=iface, verbose=False)
+    f.write(str(delay) + ",");
+    f.close();
 
 
 if __name__ == '__main__':
