@@ -11,7 +11,7 @@ from scapy.all import IP, TCP, UDP, Raw
 from scapy.layers.inet import _IPOption_HDR
 from myTunnel_header import MyTunnel
 
-filename = "dataArrival.csv"
+filename = "data.csv"
 
 def get_if():
     ifs=get_if_list()
@@ -27,16 +27,22 @@ def get_if():
 
 def handle_pkt(pkt):
     if MyTunnel in pkt or (TCP in pkt and pkt[TCP].dport == 1234):
-	timestamp = datetime.now()
+	#timestamp = datetime.now()
 	f = open(filename,"a");
-	print(filename);
+	#print(filename);
         print "got a packet"
 	
-	f.write(timestamp.strftime('%S.%f') + ",")
-
-
-    	# print "TIMESTAMP-> " + timestamp.strftime('%M:%S.%f')
+	#f.write(timestamp.strftime('%S.%f') + ",")
+	# print "TIMESTAMP-> " + timestamp.strftime('%M:%S.%f')
         pkt.show2()
+
+
+	st = pkt.sprintf("%MyTunnel.flag_4%")
+	print st[:-1]
+	f.write(st[:-1] + ",");
+	st = pkt.sprintf("%MyTunnel.flag_5%")
+	print st[:-1]
+	f.write(st[:-1] + ",");
 #        hexdump(pkt)
 #        print "len(pkt) = ", len(pkt)
 	f.close();

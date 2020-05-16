@@ -29,7 +29,6 @@ header myTunnel_t {
     bit<16> flag_2;
     bit<16> flag_3;
     bit<48> flag_4;
-    bit<48> flag_5;
 
 }
 
@@ -191,46 +190,43 @@ control MyIngress(inout headers hdr,
         if (hdr.ipv4.isValid() && !hdr.myTunnel.isValid()) {
             // Process only non-tunneled IPv4 packets
             ipv4_lpm.apply();
-        }else if (hdr.myTunnel.isValid()) {
-
-        bit<9> porta;
-	// JUST 2 PACKETS?
-	//bit<48> help;
-	//bit<32> rop;
-
-	//compute_reg_index();
-	//rop = meta.ingress_metadata.hashed_first;
-	//links_cap.read(help,rop+1);
-	//links_cap.write(rop+1, help+1);
+        }else if (hdr.myTunnel.isValid()) {      
+	bit<9> porta;
 	
+
             if (hdr.myTunnel.flag_1 == 0) {
                 // process tunneled packets
-		                
+                compute_reg_index();
                 bit<32> index;
                 index = meta.ingress_metadata.hashed_first;
                 links_cap.write(index, standard_metadata.ingress_global_timestamp);
-                if(hdr.myTunnel.flag_2 == 0 ) {
 
-		    hdr.myTunnel.flag_4 = standard_metadata.ingress_global_timestamp;
+                if(hdr.myTunnel.flag_2 == 0 ) {
                     porta = (bit<9>)hdr.myTunnel.dst_id;
                     hdr.myTunnel.flag_2 = 1;
+		    
                 } else{
-		    hdr.myTunnel.flag_5 = standard_metadata.ingress_global_timestamp;
                     porta = (bit<9>)hdr.myTunnel.flag_3;
                 }
                 }
+
             if (hdr.myTunnel.flag_1 == 1) {
+                compute_reg_index();
                 bit<32> indexw;
                 indexw = meta.ingress_metadata.hashed_second;
                 bit<48> diff;
                 links_cap.read(diff,  meta.ingress_metadata.hashed_first);
+		links_cap.write(indexw +1, standard_metadata.ingress_global_timestamp - diff);
+    		links_cap.write(indexw +2, hdr.myTunnel.flag_4);
+                diff = standard_metadata.ingress_global_timestamp - diff - hdr.myTunnel.flag_4;
+                links_cap.write(indexw, diff);
+                hdr.myTunnel.flag_4 = diff;
+		
+		
                 if(hdr.myTunnel.flag_2 == 0 ) {
-
-		    hdr.myTunnel.flag_4 = standard_metadata.ingress_global_timestamp;
                     porta = (bit<9>)hdr.myTunnel.dst_id;
                     hdr.myTunnel.flag_2 = 1;
                 } else{
-		    hdr.myTunnel.flag_5 = standard_metadata.ingress_global_timestamp;
                     porta = (bit<9>)hdr.myTunnel.flag_3;
 
                 }

@@ -13,11 +13,12 @@ class MyTunnel(Packet):
         ShortField("flag_1", 0),
         ShortField("flag_2", 0),
         ShortField("flag_3", 0),
-        IntField("flag_4",0)
+        BitField("flag_4",0,48),
+	BitField("flag_5",0,48)
         
     ]
     def mysummary(self):
-        return self.sprintf("pid=%pid%, dst_id=%dst_id%, flag_1=%flag_1%, flag_2=%flag_2%, flag_3=%flag_3%,flag_4=%flag_4%")
+        return self.sprintf("pid=%pid%, dst_id=%dst_id%, flag_1=%flag_1%, flag_2=%flag_2%, flag_3=%flag_3%,flag_4=%flag_4%,flag_5=%flag_5%")
 
 
 bind_layers(Ether, MyTunnel, type=TYPE_MYTUNNEL)
